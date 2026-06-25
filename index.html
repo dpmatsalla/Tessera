@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10151d">
+  <title>Tessera | Geometric Tessellation Strategy Game</title>
+  <meta name="description" content="Play Tessera online: a geometric abstract strategy game of tessellations, copy-and-jump movement, board control, and human or computer opponents across hexagonal, square, triangular, pentagonal, and mixed tilings.">
+  <meta name="keywords" content="tessera, tessellation game, geometry game, abstract strategy game, online board game, tiling game, hexagonal board game, square board game, triangular board game, pentagonal tiling, computer strategy game">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://spearers.com.au/tessera/">
+  <meta property="og:title" content="Tessera | Geometric Tessellation Strategy Game">
+  <meta property="og:description" content="Play Tessera online and explore geometric boards, tessellations, copy-and-jump tactics, and fast human or computer play.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://spearers.com.au/tessera/">
+  <meta property="og:site_name" content="Tessera">
+  <meta property="og:image" content="https://spearers.com.au/tessera/social-preview.png">
+  <meta property="og:image:alt" content="Tessera geometric strategy game preview">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Tessera | Geometric Tessellation Strategy Game">
+  <meta name="twitter:description" content="Play Tessera online and explore geometric boards, tessellations, and computer strategy across many tilings.">
+  <meta name="twitter:image" content="https://spearers.com.au/tessera/social-preview.png">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="manifest" href="site.webmanifest">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Tessera",
+      "url": "https://spearers.com.au/tessera/",
+      "description": "Tessera is an online abstract strategy game built around tessellations, geometric tilings, copy-and-jump movement, and human or computer opponents.",
+      "genre": ["Strategy game", "Board game", "Abstract strategy"],
+      "playMode": ["SinglePlayer", "MultiPlayer"],
+      "gamePlatform": "Web browser",
+      "applicationCategory": "Game",
+      "image": "https://spearers.com.au/tessera/social-preview.png",
+      "author": {
+        "@type": "Person",
+        "name": "Devon Matsalla"
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/styles.css?v=20260615-76">
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DCTFTXWM6"></script>
+  <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-3DCTFTXWM6'); </script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Tessera home">
+      <span class="brand-mark">T</span>
+      <span>Tessera</span>
+    </a>
+    <nav class="actions" aria-label="Application actions">
+      <button type="button" data-dialog="options-dialog">Options</button>
+      <button type="button" data-action="history">History</button>
+      <button type="button" data-dialog="help-dialog">Help <kbd>F1</kbd></button>
+      <button type="button" data-dialog="about-dialog">About</button>
+    </nav>
+  </header>
+
+  <main class="app-shell">
+    <section class="game-card" aria-labelledby="turn-heading">
+      <div class="game-heading">
+        <div>
+          <p class="eyebrow">Tile strategy game</p>
+          <h1 id="turn-heading">Player 1's Move</h1>
+        </div>
+        <span id="game-state" class="state-pill">Playing</span>
+      </div>
+
+      <div class="board-wrap">
+        <svg id="board" role="application" aria-label="Tessera game board"></svg>
+        <div class="zoom-controls" aria-label="Board zoom controls">
+          <button type="button" data-zoom="in" aria-label="Zoom in">+</button>
+          <button type="button" data-zoom="reset" aria-label="Reset board zoom">◎</button>
+          <button type="button" data-zoom="out" aria-label="Zoom out">−</button>
+        </div>
+      </div>
+
+      <div class="comment-bar" aria-live="polite">
+        <span id="comment">Select a piece to begin.</span>
+        <span id="move-legend" class="move-legend" hidden aria-label="Move destination legend">
+          <span><i class="legend-move"></i> Copy</span>
+          <span><i class="legend-jump"></i> Jump</span>
+        </span>
+      </div>
+
+      <nav class="game-controls" aria-label="Direct game controls">
+        <button type="button" data-action="new"><strong>New</strong><kbd>F2</kbd></button>
+        <button type="button" data-action="pause"><strong>Pause</strong><kbd>F4</kbd></button>
+        <button type="button" data-action="undo"><strong>Undo</strong><kbd>Ctrl+Z</kbd></button>
+        <button type="button" data-action="suggest"><strong>Suggest</strong><kbd>F3</kbd></button>
+        <button type="button" data-action="skip"><strong>Skip</strong><kbd>F5</kbd></button>
+        <button type="button" data-action="share"><strong>Share</strong><kbd>Link</kbd></button>
+        <label class="speed-control">
+          <span>Computer speed</span>
+          <input id="speed" type="range" min="1" max="2500" step="10">
+          <output id="speed-output"></output>
+        </label>
+      </nav>
+
+      <section class="score-grid" aria-label="Game score">
+        <article class="score-card player-one">
+          <span class="score-dot"></span>
+          <div>
+            <button type="button" id="player-1-trigger" class="player-popup-trigger" data-player-popup="1" aria-haspopup="dialog" aria-expanded="false">
+              <strong id="player-1-name">Human</strong>
+            </button>
+            <small id="move-1">No moves yet</small>
+          </div>
+          <b id="score-1">3</b>
+          <div id="player-1-popup" class="player-popup" data-player-popup-panel="1" hidden>
+            <label>Control
+              <select class="player-type" data-player="1">
+                <option value="human">Human</option>
+                <option value="computer">Computer</option>
+              </select>
+            </label>
+            <label>Color
+              <input class="player-color" data-player="1" type="color">
+            </label>
+            <label>Skill Level
+              <select class="player-difficulty" data-player="1">
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+                <option value="expert">Expert</option>
+                <option value="classic">Classic VB</option>
+              </select>
+            </label>
+            <label class="classic-only">Classic skill
+              <input class="player-skill" data-player="1" type="range" min="1" max="15">
+              <output class="skill-output"></output>
+            </label>
+            <label>Aggressiveness
+              <input class="player-aggression" data-player="1" type="range" min="1" max="15">
+              <output class="aggression-output"></output>
+            </label>
+          </div>
+        </article>
+        <article class="score-card player-two">
+          <span class="score-dot"></span>
+          <div>
+            <button type="button" id="player-2-trigger" class="player-popup-trigger" data-player-popup="2" aria-haspopup="dialog" aria-expanded="false">
+              <strong id="player-2-name">Computer</strong>
+            </button>
+            <small id="move-2">No moves yet</small>
+          </div>
+          <b id="score-2">3</b>
+          <div id="player-2-popup" class="player-popup" data-player-popup-panel="2" hidden>
+            <label>Control
+              <select class="player-type" data-player="2">
+                <option value="human">Human</option>
+                <option value="computer">Computer</option>
+              </select>
+            </label>
+            <label>Color
+              <input class="player-color" data-player="2" type="color">
+            </label>
+            <label>Skill Level
+              <select class="player-difficulty" data-player="2">
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+                <option value="expert">Expert</option>
+                <option value="classic">Classic VB</option>
+              </select>
+            </label>
+            <label class="classic-only">Classic skill
+              <input class="player-skill" data-player="2" type="range" min="1" max="15">
+              <output class="skill-output"></output>
+            </label>
+            <label>Aggressiveness
+              <input class="player-aggression" data-player="2" type="range" min="1" max="15">
+              <output class="aggression-output"></output>
+            </label>
+          </div>
+        </article>
+        <article class="score-card neutral">
+          <div><strong>Board</strong><small><span id="rock-count">1</span> rocks · <span id="free-count">0</span> free</small></div>
+        </article>
+      </section>
+    </section>
+  </main>
+
+  <section class="discover-shell" aria-labelledby="discover-title">
+    <div class="discover-card discover-hero">
+      <p class="eyebrow">Geometric Strategy</p>
+      <h2 id="discover-title">Tessera is an abstract strategy game built for people who love tessellations, board games, and computer play.</h2>
+      <p class="discover-lead">Copy pieces, leap across the board, convert opposing tiles, and explore how different geometric tilings change the tactics. Play classic boards, exotic mosaics, human matches, and fast computer-versus-computer battles.</p>
+    </div>
+
+    <div class="discover-grid" aria-label="Tessera highlights">
+      <article class="discover-card">
+        <h3>Many Board Families</h3>
+        <p>Tessera spans hexagonal, square, triangular, pentagonal, octagonal, and mixed tilings so the same core rules feel fresh on every board.</p>
+      </article>
+      <article class="discover-card">
+        <h3>Human and Computer Play</h3>
+        <p>Challenge another player, test yourself against the computer, or watch the computer analyze and fight across large geometric boards.</p>
+      </article>
+      <article class="discover-card">
+        <h3>Editable Rules</h3>
+        <p>Customize copy and jump patterns for board types and explore how changing local geometry changes the whole strategic landscape.</p>
+      </article>
+    </div>
+
+    <section class="discover-card board-showcase" aria-labelledby="board-showcase-title">
+      <h3 id="board-showcase-title">Board Types</h3>
+      <div class="board-showcase-grid">
+        <article><h4>Hexagonal</h4><p>The 2002-style board with smooth multi-directional expansion and broad tactical pressure.</p></article>
+        <article><h4>Square</h4><p>The original grid-based format with direct territorial battles and compact tactical traps.</p></article>
+        <article><h4>Triangular</h4><p>Three-edge adjacency and corner jumps create a very different sense of space and tempo.</p></article>
+        <article><h4>Cairo Pentagonal</h4><p>A five-sided tiling where shape and orientation matter more than in a standard grid.</p></article>
+        <article><h4>Octagon and Square</h4><p>Mixed tile families force you to think about how move ranges shift from one cell type to another.</p></article>
+        <article><h4>Advanced Tilings</h4><p>Rhombitrihexagonal and mosaic boards reward players who enjoy symmetry, motifs, and geometric pattern recognition.</p></article>
+      </div>
+    </section>
+
+    <section class="discover-card faq" aria-labelledby="faq-title">
+      <h3 id="faq-title">Frequently Asked Questions</h3>
+      <dl>
+        <dt>What is Tessera?</dt>
+        <dd>Tessera is an abstract strategy board game about tessellations, copy-and-jump movement, and piece conversion across many geometric board types.</dd>
+
+        <dt>How do you play?</dt>
+        <dd>Move one step to duplicate a piece, or jump farther to relocate it. After every move, adjacent enemy pieces convert to your side. Finish with more pieces than your opponent.</dd>
+
+        <dt>Can I play against the computer?</dt>
+        <dd>Yes. Tessera supports human versus computer play and computer-versus-computer play, with adjustable speed and suggestion controls.</dd>
+
+        <dt>Why do the different tilings matter?</dt>
+        <dd>Each tiling changes adjacency, jump structure, and spatial control. That means the same core rules lead to very different strategies from one board to another.</dd>
+      </dl>
+    </section>
+  </section>
+
+  <dialog id="options-dialog" class="options-dialog">
+    <form method="dialog">
+      <header>
+        <div><p class="eyebrow">Options</p><h2>Game setup</h2></div>
+        <button aria-label="Close">×</button>
+      </header>
+      <div class="options-body">
+        <fieldset>
+          <legend>Board</legend>
+          <label>Shape
+            <select id="board-shape">
+            </select>
+          </label>
+          <label>Size
+            <select id="board-size"></select>
+          </label>
+          <label>Rocks
+            <select id="rock-percent"></select>
+          </label>
+          <div class="field">
+            <span>Start position</span>
+            <div class="segmented">
+              <label><input type="radio" name="start" value="center"> Center</label>
+              <label><input type="radio" name="start" value="corners"> Corners</label>
+            </div>
+          </div>
+          <label>Rock color <input id="rock-color" type="color"></label>
+          <label>Undo history
+            <select id="undo-turns"></select>
+            <small id="undo-turns-note">Previous turns retained for Undo and replay.</small>
+          </label>
+        </fieldset>
+
+        <fieldset class="rules-preview-panel">
+          <legend>Rule preview</legend>
+          <label>Tile type
+            <select id="rules-tile-type"></select>
+          </label>
+          <div class="rules-editor-toolbar">
+            <button type="button" id="rules-mode-copy" class="secondary-button rules-mode-button">Edit copies</button>
+            <button type="button" id="rules-mode-jump" class="secondary-button rules-mode-button">Edit jumps</button>
+            <button type="button" id="rules-reset-tile" class="secondary-button">Reset tile</button>
+            <button type="button" id="rules-reset-shape" class="secondary-button">Reset board</button>
+            <button type="button" id="rules-save" class="primary-button">Save rules</button>
+          </div>
+          <p id="rules-preview-note" class="rules-preview-note">
+            Preview of the current copy and jump destinations for the selected tile type.
+          </p>
+          <div class="rules-preview-stage">
+            <svg id="rules-preview-board" viewBox="-100 -100 200 200" aria-label="Rules preview board"></svg>
+          </div>
+          <p id="rules-preview-summary" class="rules-preview-summary"></p>
+        </fieldset>
+      </div>
+      <footer>
+        <button type="button" class="secondary-button" data-close-dialog="options-dialog">Close</button>
+        <button type="button" class="primary-button" data-action="new" data-close-dialog="options-dialog">Start new game</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="history-dialog" class="history-dialog">
+    <form method="dialog">
+      <header><div><p class="eyebrow">Timeline</p><h2>Move history</h2></div><button aria-label="Close">×</button></header>
+      <div class="dialog-body">
+        <p id="history-note" class="history-note"></p>
+        <ol id="move-history" class="move-history"></ol>
+        <p id="replay-position" class="replay-position"></p>
+      </div>
+      <footer class="replay-controls">
+        <button type="button" class="secondary-button" data-action="replay-exit">Live game</button>
+        <button type="button" class="secondary-button" data-action="replay-prev">Previous</button>
+        <button type="button" class="primary-button" data-action="replay-next">Next</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="game-over-dialog" class="game-over-dialog">
+    <form method="dialog">
+      <header><div><p class="eyebrow">Game complete</p><h2 id="game-over-title">Winner</h2></div><button aria-label="Close">×</button></header>
+      <div class="dialog-body game-over-body">
+        <p id="game-over-summary"></p>
+        <div class="final-score">
+          <span><b id="final-score-1">0</b><small id="final-name-1">Player 1</small></span>
+          <i>:</i>
+          <span><b id="final-score-2">0</b><small id="final-name-2">Player 2</small></span>
+        </div>
+      </div>
+      <footer>
+        <button type="button" class="secondary-button" data-action="history">Replay</button>
+        <button type="button" class="primary-button" data-action="new" data-close-dialog="game-over-dialog">Rematch</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="help-dialog">
+    <form method="dialog">
+      <header><div><p class="eyebrow">How to play</p><h2>Tessera Help</h2></div><button aria-label="Close">×</button></header>
+      <div class="dialog-body">
+        <p>Win by finishing with more pieces than your opponent. Moving one space duplicates your piece. Jumping two spaces moves it. After either move, every adjacent enemy piece changes to your color.</p>
+        <p>Choose Hexagonal for the 2002 rules, Square (1996) for the original grid, Triangular, Cairo pentagonal, or Octagon and square. Every mode copies across shared edges and uses its shape-specific jump destinations.</p>
+        <p>Select one of your pieces, then select a highlighted empty space. You can also press and drag from a piece to its destination.</p>
+        <p>Pinch with two fingers or use the mouse wheel to zoom. Drag an empty part of the board to pan. Use the center zoom button to reset the view.</p>
+        <dl class="shortcuts">
+          <dt>F1</dt><dd>Open help</dd><dt>F2</dt><dd>New game</dd>
+          <dt>F3</dt><dd>Suggest a move</dd><dt>F4</dt><dd>Pause or resume</dd>
+          <dt>F5</dt><dd>Skip the current turn</dd><dt>Ctrl+Z</dt><dd>Undo</dd>
+        </dl>
+      </div>
+      <footer><button class="primary-button">Close</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="about-dialog">
+    <form method="dialog">
+      <header><div><p class="eyebrow">Welcome</p><h2>Discover Tessera</h2></div><button aria-label="Close">×</button></header>
+      <div class="dialog-body about-copy">
+        <div class="about-hero">
+          <div class="brand-mark large">T</div>
+          <p class="about-title">Tessera</p>
+          <p class="about-subtitle">An abstract strategy duel across tessellations, geometry, and evolving boards.</p>
+        </div>
+        <div class="about-story">
+          <p>Tessera began as an earlier strategy game created by Devon Matsalla in May 1992, revised in April 2002, and rebuilt for the web in 2026. What started as a compact competitive board game has grown into a playground of hexagons, squares, triangles, pentagons, octagons, and more.</p>
+          <p>The idea is simple and surprisingly deep: move one step to copy a piece, or leap farther to relocate it. Every move converts adjacent enemy pieces to your side, so the board can swing in a single well-timed turn. Different tilings change the geometry, the tactics, and the feel of the game.</p>
+          <p>Play against another person, challenge the computer, or let two computer players battle at speed. Explore the different board systems, watch how each shape changes the strategy, and learn the patterns that let a small advantage spread across the whole mosaic.</p>
+        </div>
+      </div>
+      <footer><button class="primary-button">Begin Playing</button></footer>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/app.js?v=20260615-76"></script>
+</body>
+</html>

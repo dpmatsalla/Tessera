@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://spearers.com.au/tessera/sitemap.xml

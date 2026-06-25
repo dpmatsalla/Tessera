@@ -1,0 +1,18 @@
+{
+  "name": "Tessera",
+  "short_name": "Tessera",
+  "start_url": "https://spearers.com.au/tessera/",
+  "scope": "https://spearers.com.au/tessera/",
+  "display": "standalone",
+  "background_color": "#0b0f15",
+  "theme_color": "#10151d",
+  "description": "A geometric abstract strategy game played across tessellations and tilings.",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
