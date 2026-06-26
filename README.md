@@ -2,7 +2,7 @@
 
 A static HTML, CSS, and JavaScript recreation of the 2002 Visual Basic 6
 version of Tessera. It requires no database, PHP, Node.js, or server-side
-framework after deployment.
+framework after deployment.  Developed by Devon Matsalla.
 
 ## Play locally
 
